@@ -41,7 +41,7 @@ public class SimpleEspressoTest {
     @Before
     public void SetUp()
     {
-        textToFind = "Not Hello World!";
+        textToFind = "Hello World!";
     }
 
     @Test
