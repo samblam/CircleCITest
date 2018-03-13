@@ -15,7 +15,7 @@ jobs:
           command: chmod +x ./gradlew
       - run:
           name: Download Dependencies
-          command: | sudo chmod +x gradlew ./gradlew androidDependencies
+          command: sudo chmod +x gradlew && ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
