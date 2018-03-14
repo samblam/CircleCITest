@@ -126,6 +126,9 @@ jobs:
       - checkout
       - *restore_cache
       - run:
+          name: chmod permissions
+          command: chmod +x ./gradlew
+      - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
       - *save_cache
@@ -174,7 +177,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - build_debug:
+      - build_debug
       - test_unit
       - test_instrumented:
           requires:
