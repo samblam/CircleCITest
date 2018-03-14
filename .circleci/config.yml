@@ -102,6 +102,9 @@ jobs:
       - checkout
       - *restore_cache
       - run:
+          name: chmod permissions
+          command: chmod +x ./gradlew
+      - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
       - *save_cache
@@ -166,21 +169,14 @@ jobs:
       - store_artifacts:
           path: firebase/
           destination: /firebase/
-  set_permissions:
-    steps:
-      - run:
-        name: chmod permissions
-        command: chmod +x ./gradlew
 
 workflows:
   version: 2
   workflow:
     jobs:
-      - set_permissions
       - build_debug:
         requires:
           - set_permissions
-
       #- test_unit
       - test_instrumented:
           requires:
