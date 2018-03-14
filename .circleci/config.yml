@@ -27,10 +27,10 @@ references:
     persist_to_workspace:
       root: *workspace
       paths:
-        - mobile/build/outputs/androidTest-results
-        - mobile/build/outputs/apk
-        - mobile/build/outputs/code-coverage
-        - mobile/build/test-results
+        - app/build/outputs/androidTest-results
+        - app/build/outputs/apk
+        - app/build/outputs/code-coverage
+        - app/build/test-results
   attach_firebase_workspace: &attach_firebase_workspace
     attach_workspace:
       at: *workspace
@@ -79,7 +79,7 @@ references:
   decode_gservices_key: &decode_gservices_key
     run:
       name: Decode Google Services key
-      command: echo $GOOGLE_SERVICES_KEY | base64 -di > mobile/google-services.json
+      command: echo $GOOGLE_SERVICES_KEY | base64 -di > app/google-services.json
 
   # Google Cloud Service
 
@@ -112,10 +112,10 @@ jobs:
       - *decode_gservices_key
       - run:
           name: Gradle build (debug)
-          command: ./gradlew -PciBuild=true :mobile:assembleDebug :mobile:assembleAndroidTest
+          command: ./gradlew -PciBuild=true :app:assembleDebug :app:assembleAndroidTest
       - *persist_debug_workspace
       - store_artifacts:
-          path: mobile/build/outputs/apk/
+          path: app/build/outputs/apk/
           destination: /apk/
 
   ## Run unit tests
@@ -136,13 +136,13 @@ jobs:
       - *decode_gservices_key
       - run:
           name: Run unit tests
-          command: ./gradlew -PciBuild=true :mobile:testDebugUnitTest
+          command: ./gradlew -PciBuild=true :app:testDebugUnitTest
       - *persist_debug_workspace
       - store_artifacts:
-          path: mobile/build/reports/
+          path: app/build/reports/
           destination: /reports/
       - store_test_results:
-          path: mobile/build/test-results/
+          path: app/build/test-results/
           destination: /test-results/
 
   ## Run instrumented tests
@@ -161,7 +161,7 @@ jobs:
           command: gcloud auth activate-service-account firebase-adminsdk-evfh9@circlecitest-c7339.iam.gserviceaccount.com --key-file ${HOME}/client-secret.json
       - run:
           name: Run instrumented test on Firebase Test Lab
-          command: gcloud firebase test android run --type instrumentation --app mobile/build/outputs/apk/debug/mobile-debug.apk --test mobile/build/outputs/apk/androidTest/debug/mobile-debug-androidTest.apk --device model=sailfish,version=26,locale=en_US,orientation=portrait --environment-variables coverage=true,coverageFile=/sdcard/tmp/code-coverage/connected/coverage.ec --directories-to-pull=/sdcard/tmp --timeout 20m
+          command: gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/debug/app-debug.apk --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk --device model=sailfish,version=26,locale=en_US,orientation=portrait --environment-variables coverage=true,coverageFile=/sdcard/tmp/code-coverage/connected/coverage.ec --directories-to-pull=/sdcard/tmp --timeout 20m
       - run:
           name: Create directory to store test results
           command: mkdir firebase
@@ -178,7 +178,9 @@ workflows:
   workflow:
     jobs:
       - build_debug
-      - test_unit
+      - test_unit:
+         requires:
+            - build_debug
       - test_instrumented:
           requires:
             - build_debug
