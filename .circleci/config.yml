@@ -166,12 +166,21 @@ jobs:
       - store_artifacts:
           path: firebase/
           destination: /firebase/
+  set_permissions:
+    steps:
+      - run:
+        name: chmod permissions
+        command: chmod +x ./gradlew
 
 workflows:
   version: 2
   workflow:
     jobs:
-      - build_debug
+      - set_permissions
+      - build_debug:
+        requires:
+          - set_permissions
+
       #- test_unit
       - test_instrumented:
           requires:
