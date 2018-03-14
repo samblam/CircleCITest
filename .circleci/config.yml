@@ -175,9 +175,7 @@ workflows:
   workflow:
     jobs:
       - build_debug:
-        requires:
-          - set_permissions
-      #- test_unit
+      - test_unit
       - test_instrumented:
           requires:
             - build_debug
