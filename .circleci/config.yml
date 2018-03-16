@@ -183,4 +183,8 @@ workflows:
             - build_debug
       - test_instrumented:
           requires:
-            - build_debug
+            - test_unit
+          filters:
+            branches:
+              only:
+                - master
